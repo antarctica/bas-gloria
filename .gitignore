@@ -1,0 +1,6 @@
+*.pyc
+tmp/
+__pycache__/
+*egg-info/
+dist/
+example_data/
