@@ -33,8 +33,16 @@ The format of the text file is a straightforward rendering of the binary .dat fo
 This script will plot the scans from the given file as a sonargram, in its default mode (`--sonargram`).  In its other mode (`--scans`), it will plot samples from the first `nrows` x `ncols` scans, in an `nrows` by `ncols` grid of plots.  By default `nrows` = `ncols` = 1, hence only the first scan is plotted.  The file can be either a GLORIA .dat file, or a converted netCDF file.
 
 ```bash
-python3 plot_gloria.py [-h] [-r | -s] [-g NROWS NCOLS] [-c CONTRAST] [-m CMAP] filename.{dat,nc}
+python3 plot_gloria.py [-h] [-r | -s] [-g NROWS NCOLS] [-c CONTRAST] [-m CMAP] [-o out_file.{png,tiff,pdf}] in_file.{dat,nc} [out_file.{png,tiff,pdf}]
 ```
+
+Alternatively, instead of displaying the plot, the script can save the plot to an output file.  This can be speficied by *either* the `--output-file` option, *or* simply as a second, optional positional argument, for example to save as a PNG:
+
+```bash
+python3 plot_gloria.py in_file.dat out_file.png
+```
+
+When saving the plot, any of the formats supported by matplotlib can be specified by using the appropriate file suffix.  For example, an output file named `out_file.tiff` will save as a TIFF file, `out_file.pdf` will save as a PDF etc.
 
 #### read_gloria.py
 

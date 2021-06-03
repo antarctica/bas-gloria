@@ -66,32 +66,45 @@ def parse_cmdln():
 
 Plot the given GLORIA .dat file as a sonargram:
 
-python3 plot_gloria.py filename.dat
+python3 plot_gloria.py in_file.dat
 
 Plot the given converted netCDF file as a sonargram:
 
-python3 plot_gloria.py filename.nc
+python3 plot_gloria.py in_file.nc
 
 Plot the given GLORIA file as a sonargram, increasing the contrast:
 
-python3 plot_gloria.py -c 10 filename.dat
+python3 plot_gloria.py -c 10 in_file.dat
 
 Same as above, but with a blue-white-red colour map:
 
-python3 plot_gloria.py -c 10 -m bwr filename.dat
+python3 plot_gloria.py -c 10 -m bwr in_file.dat
 
 Plot the first scan from the given GLORIA file:
 
-python3 plot_gloria.py -s filename.dat
+python3 plot_gloria.py -s in_file.dat
 
 Plot the first 6 scans, in a 3x2 grid:
 
-python3 plot_gloria.py -s -g 3 2 filename.dat
+python3 plot_gloria.py -s -g 3 2 in_file.dat
+
+Plot a sonargram and save to the given output PNG file, rather than display:
+
+python3 plot_gloria.py in_file.dat out_file.png
+
+This is an alternative syntax, and is equivalent to the above:
+
+python3 plot_gloria.py -o out_file.png in_file.dat
+
+When saving the plot, any of the formats supported by matplotlib can be
+specified by using the appropriate file suffix.  For example, an output file
+named out_file.tiff will save as a TIFF file, out_file.pdf will save as a PDF
+etc.
 """
 
     parser = argparse.ArgumentParser(description='plot GLORIA data, either from a .dat file, or a converted netCDF file', epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument('filename', help='filename')
+    parser.add_argument('in_file', help='input file')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-r', '--sonargram', help='plot a sonargram', action='store_const', dest='type', const='sonargram')
@@ -102,19 +115,29 @@ python3 plot_gloria.py -s -g 3 2 filename.dat
     parser.add_argument('-c', '--contrast', help='contrast for the sonargram', dest='contrast', default=1.0, type=float)
     parser.add_argument('-m', '--cmap', help='colour map for the sonargram', dest='cmap', default='gray')
 
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-o', '--output-file', help='output file')
+    group.add_argument('out_file', help='output file', nargs='?')
+
     args = parser.parse_args()
+
+    # Using a shared `dest` doesn't work for an option and optional positional
+    # argument, so resolve out_file here
+    if args.out_file is None:
+        if args.output_file:
+            args.out_file = args.output_file
 
     return args
 
 if __name__ == '__main__':
     args = parse_cmdln()
-    suffix = os.path.splitext(args.filename)[1]
+    suffix = os.path.splitext(args.in_file)[1]
 
     if suffix.lower() == '.dat':
-        with GLORIAFile(args.filename) as f:
+        with GLORIAFile(args.in_file) as f:
             data = f.read()
     elif suffix.lower() == '.nc':
-        with Dataset(args.filename, 'r') as f:
+        with Dataset(args.in_file, 'r') as f:
             data = {'scans': []}
 
             for key in f.groups:
@@ -167,6 +190,10 @@ if __name__ == '__main__':
         # Plot the vertical scans as a sonargram
         construct_sonargram(plt, mat, xaxis, yaxis, ylim=ylim, contrast=args.contrast, cmap=args.cmap)
 
-    plt.suptitle(os.path.basename(args.filename))
-    plt.show()
+    plt.suptitle(os.path.basename(args.in_file))
+
+    if args.out_file:
+        plt.savefig(args.out_file)
+    else:
+        plt.show()
 
