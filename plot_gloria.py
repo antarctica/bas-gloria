@@ -133,10 +133,7 @@ if __name__ == '__main__':
     args = parse_cmdln()
     suffix = os.path.splitext(args.in_file)[1]
 
-    if suffix.lower() == '.dat':
-        with GLORIAFile(args.in_file) as f:
-            data = f.read()
-    elif suffix.lower() == '.nc':
+    if suffix.lower() == '.nc':
         with Dataset(args.in_file, 'r') as f:
             data = {'scans': []}
 
@@ -151,7 +148,8 @@ if __name__ == '__main__':
                 scan['sonar_samples'] = [f.groups[key].variables['scan'][:]]
                 data['scans'].append(scan)
     else:
-        raise ValueError('Unknown or unsupported file type: {}'.format(suffix))
+        with GLORIAFile(args.in_file) as f:
+            data = f.read()
 
     if args.type == 'scans':
         (nrows, ncols) = args.grid
