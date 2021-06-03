@@ -8,7 +8,7 @@
 from setuptools import setup
 
 setup(name='gloria',
-      version='0.1',
+      version='0.2',
       description='Package for working with GLORIA files',
       url='https://gitlab.data.bas.ac.uk/pbree/gloria',
       author='Paul Breen',
