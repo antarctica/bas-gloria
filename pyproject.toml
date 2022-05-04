@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "bas-gloria"
+version = "0.2.0"
+description = "Package for working with GLORIA side-scan sonar files"
+authors = ["Paul Breen <pbree@bas.ac.uk>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/antarctica/bas-gloria"
+homepage = "https://github.com/antarctica/bas-gloria"
+documentation = "https://github.com/antarctica/bas-gloria/blob/main/README.md"
+
+# This is required because the "name" above is different to the
+# directory/module name
+packages = [
+    {include = "gloria"}
+]
+
+[tool.poetry.scripts]
+gloria_to_nc = "gloria.gloria_to_nc:main"
+gloria_to_txt = "gloria.gloria_to_txt:main"
+plot_gloria = "gloria.plot_gloria:main"
+read_gloria = "gloria.read_gloria:main"
+write_gloria = "gloria.write_gloria:main"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1.17.2"
+matplotlib = "^3.4.3"
+netCDF4 = "^1.5.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
