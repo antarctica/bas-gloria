@@ -1,17 +1,13 @@
-import sys
-import os
+import argparse
 
-from gloria.gloria import GLORIAFile
+from gloria import GLORIAFile
 
-if __name__ == '__main__':
-    try:
-        infile = sys.argv[1]
-    except IndexError:
-        progname = os.path.basename(sys.argv[0])
-        print('Usage: {} infile.dat'.format(progname))
-        sys.exit(2)
- 
-    with GLORIAFile(infile) as f:
+def main():
+    parser = argparse.ArgumentParser(description='print the header, a sample of the data, and diagnostics, from the given GLORIA file')
+    parser.add_argument('infile', help='GLORIA file')
+    args = parser.parse_args()
+
+    with GLORIAFile(args.infile) as f:
         data = f.read()
 
         print('Number of scans = {}'.format(len(data['scans'])))
@@ -38,4 +34,7 @@ if __name__ == '__main__':
         if len(samples) > 0:
             nsamples = 10 if len(samples) > 10 else len(samples)
             print('scan {}: first {} samples = {}'.format(scan_number, nsamples, samples[0:nsamples]))
+
+if __name__ == '__main__':
+    main()
 

@@ -1,4 +1,3 @@
-import sys
 import os
 import argparse
 
@@ -6,7 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from netCDF4 import Dataset
 
-from gloria.gloria import GLORIAFile
+from gloria import GLORIAFile
 
 def construct_sonargram(plt, mat, xaxis, yaxis, xlim=None, ylim=None,
                         xlabel='scan number',
@@ -129,27 +128,15 @@ etc.
 
     return args
 
-if __name__ == '__main__':
-    args = parse_cmdln()
-    suffix = os.path.splitext(args.in_file)[1]
+def plot_data(args, data):
+    """
+    Plot the given data
 
-    if suffix.lower() == '.nc':
-        with Dataset(args.in_file, 'r') as f:
-            data = {'scans': []}
-
-            for key in f.groups:
-                scan = {}
-
-                # Reconstruct a simile of the scan header
-                for hkey in vars(f.groups[key]):
-                    scan[hkey] = [getattr(f.groups[key], hkey)]
-
-                # We make a copy, otherwise data is invalid after file is closed
-                scan['sonar_samples'] = [f.groups[key].variables['scan'][:]]
-                data['scans'].append(scan)
-    else:
-        with GLORIAFile(args.in_file) as f:
-            data = f.read()
+    :param args: The parsed command line arguments object
+    :type args: argparse.Namespace object
+    :param data: The data to plot
+    :type data: dict
+    """
 
     if args.type == 'scans':
         (nrows, ncols) = args.grid
@@ -194,4 +181,33 @@ if __name__ == '__main__':
         plt.savefig(args.out_file)
     else:
         plt.show()
+
+def main():
+    args = parse_cmdln()
+    suffix = os.path.splitext(args.in_file)[1]
+
+    if suffix.lower() == GLORIAFile.DEFAULTS['netcdf_suffix']:
+        with Dataset(args.in_file, 'r') as f:
+            data = {'scans': []}
+
+            for key in f.groups:
+                scan = {}
+
+                # Reconstruct a simile of the scan header
+                for hkey in vars(f.groups[key]):
+                    scan[hkey] = [getattr(f.groups[key], hkey)]
+
+                # We make a copy, otherwise data is invalid after file is closed
+                scan['sonar_samples'] = [f.groups[key].variables['scan'][:]]
+                data['scans'].append(scan)
+    else:
+        # Here we make an assumption that anything else is a GLORIA file.  This
+        # is because a GLORIA file may not have any suffix
+        with GLORIAFile(args.in_file) as f:
+            data = f.read()
+
+    plot_data(args, data)
+
+if __name__ == '__main__':
+    main()
 
