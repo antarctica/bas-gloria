@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/antarctica/bas-gloria"
 homepage = "https://github.com/antarctica/bas-gloria"
-documentation = "https://github.com/antarctica/bas-gloria/blob/main/README.md"
+documentation = "https://github.com/antarctica/bas-gloria/blob/master/README.md"
 
 # This is required because the "name" above is different to the
 # directory/module name
